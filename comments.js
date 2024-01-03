@@ -1,20 +1,29 @@
 // create web server
-const express = require('express');
+import express from 'express';
+import { json } from 'body-parser';
+import { randomBytes } from 'crypto';
+import cors from 'cors';
+
 const app = express();
-const port = 3000;
-const path = require('path');
-const bodyParser = require('body-parser');
+// allow cross origin resource sharing
+app.use(cors());
+app.use(json());
 
-// set up body parser for json
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const commentsByPostId = {};
 
-// set up static files
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.get('/posts/:id/comments', (req, res) => {
+	res.send(commentsByPostId[req.params.id] || []);
+});
 
-// set up routes
-const routes = require('./routes.js');
-app.use('/api', routes);
+app.post('/posts/:id/comments', (req, res) => {
+	const commentId = randomBytes(4).toString('hex');
+	const { content } = req.body;
+	const comments = commentsByPostId[req.params.id] || [];
+	comments.push({ id: commentId, content });
+	commentsByPostId[req.params.id] = comments;
+	res.status(201).send(comments);
+});
 
-// start server
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(4001, () => {
+	console.log('Listening on 4001');
+});
