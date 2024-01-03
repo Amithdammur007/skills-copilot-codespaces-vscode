@@ -48,4 +48,17 @@ var server = http.createServer(function(request,response){
         console.log('name=',name);
         console.log('comment=',comment);
       });
-        //
+        // 2.8 response
+        response.end('ok');
+      }else{
+        response.statusCode = 404;
+        response.end('404 not found');
+      }
+      // 2.9
+    });
+    // 3. start server
+    server.listen(3000,function(){
+      console.log('Server running at http://localhost:3000/');
+    });
+    // Path: comments.js
+// create web server
